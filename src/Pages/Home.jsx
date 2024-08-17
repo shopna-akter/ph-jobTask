@@ -8,15 +8,20 @@ const Home = () => {
     const [count, setCount] = useState(0);
     const [sortOrder, setSortOrder] = useState('priceLowToHigh');
     const [searchValue, setSearchValue] = useState('');
+    const [brandFilter, setBrandFilter] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('');
+    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}`);
+            const response = await fetch(
+                `http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}&brand=${brandFilter}&category=${categoryFilter}&minPrice=${priceRange.min}&maxPrice=${priceRange.max}`
+            );
             const data = await response.json();
             setProducts(data);
         };
         fetchProducts();
-    }, [currentPage, itemsPerPage, sortOrder, searchValue]);
+    }, [currentPage, itemsPerPage, sortOrder, searchValue, brandFilter, categoryFilter, priceRange]);
 
     useEffect(() => {
         const fetchCount = async () => {
@@ -55,6 +60,21 @@ const Home = () => {
         setSearchValue(e.target.searchField.value);
     };
 
+    const handleBrandFilter = (e) => {
+        setBrandFilter(e.target.value);
+        setCurrentPage(0);
+    };
+
+    const handleCategoryFilter = (e) => {
+        setCategoryFilter(e.target.value);
+        setCurrentPage(0);
+    };
+
+    const handlePriceRange = (e) => {
+        setPriceRange({ ...priceRange, [e.target.name]: e.target.value });
+        setCurrentPage(0);
+    };
+
     return (
         <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-4">
@@ -67,13 +87,56 @@ const Home = () => {
                     />
                     <button type="submit" className="btn btn-primary ml-2">Search</button>
                 </form>
-                <div>
+                <div className="flex">
                     <label htmlFor="sort" className="mr-2">Sort by:</label>
                     <select id="sort" onChange={handleSort} className="select select-bordered">
                         <option value="priceLowToHigh">Price: Low to High</option>
                         <option value="priceHighToLow">Price: High to Low</option>
                         <option value="dateNewestFirst">Date Added: Newest first</option>
                     </select>
+                </div>
+            </div>
+
+            <div className="flex justify-between items-center mb-4">
+                <div>
+                    <label htmlFor="brandFilter" className="mr-2">Brand:</label>
+                    <input
+                        id="brandFilter"
+                        type="text"
+                        placeholder="Brand Name"
+                        className="input input-bordered"
+                        onChange={handleBrandFilter}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="categoryFilter" className="mr-2">Category:</label>
+                    <input
+                        id="categoryFilter"
+                        type="text"
+                        placeholder="Category Name"
+                        className="input input-bordered"
+                        onChange={handleCategoryFilter}
+                    />
+                </div>
+                <div className="flex">
+                    <label htmlFor="minPrice" className="mr-2">Min Price:</label>
+                    <input
+                        id="minPrice"
+                        name="min"
+                        type="number"
+                        placeholder="Min"
+                        className="input input-bordered"
+                        onChange={handlePriceRange}
+                    />
+                    <label htmlFor="maxPrice" className="mr-2 ml-4">Max Price:</label>
+                    <input
+                        id="maxPrice"
+                        name="max"
+                        type="number"
+                        placeholder="Max"
+                        className="input input-bordered"
+                        onChange={handlePriceRange}
+                    />
                 </div>
             </div>
 

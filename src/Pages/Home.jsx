@@ -7,14 +7,15 @@ const Home = () => {
     const [itemsPerPage, setItemsPerPage] = useState(8);
     const [count, setCount] = useState(0);
     const [selected, setSelected] = useState('bg-indigo-500 hover:bg-indigo-500');
+    const [sortOrder, setSortOrder] = useState('priceLowToHigh');
 
     useEffect(() => {
-        fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}`)
+        fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}`)
             .then(res => res.json())
             .then(data => {
                 setProducts(data);
             });
-    }, [currentPage, itemsPerPage]);
+    }, [currentPage, itemsPerPage, sortOrder]);
 
     useEffect(() => {
         fetch('http://localhost:5000/productsCount')
@@ -47,43 +48,59 @@ const Home = () => {
         }
     };
 
+    const handleSortChange = (e) => {
+        const value = e.target.value;
+        setSortOrder(value);
+        setCurrentPage(0);
+    };
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((product) => (
-                <div className="mx-4" key={product._id}>
-                    <div className="mb-4">
-                        <div className="card border bg-base-100 shadow-xl">
-                            <img src={product.productImage} alt={product.productName} className="w-full h-48 object-cover" />
-                            <div className="card-body text-left">
-                                <div className="text-center mr-2">
-                                    <h2 className="font-bold text-xl">{product.productName}</h2>
-                                </div>
-                                <p>{product.description}</p>
-                                <div className="card-actions justify-between">
-                                    <div className="flex gap-2">
-                                        <span>Price:</span>
-                                        <span>${product.price}</span>
+        <div className="container mx-auto p-4">
+            <div className="mb-4 flex justify-center">
+                <label htmlFor="sort" className="mr-2">Sort by:</label>
+                <select id="sort" className="btn" value={sortOrder} onChange={handleSortChange}>
+                    <option value="priceLowToHigh">Price: Low to High</option>
+                    <option value="priceHighToLow">Price: High to Low</option>
+                    <option value="dateNewestFirst">Date Added: Newest First</option>
+                </select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {products.map((product) => (
+                    <div className="mx-4" key={product._id}>
+                        <div className="mb-4">
+                            <div className="card border bg-base-100 shadow-xl">
+                                <img src={product.productImage} alt={product.productName} className="w-full h-48 object-cover" />
+                                <div className="card-body text-left">
+                                    <div className="text-center mr-2">
+                                        <h2 className="font-bold text-xl">{product.productName}</h2>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <span>Category:</span>
-                                        <span>{product.category}</span>
+                                    <p>{product.description}</p>
+                                    <div className="card-actions justify-between">
+                                        <div className="flex gap-2">
+                                            <span>Price:</span>
+                                            <span>${product.price}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span>Category:</span>
+                                            <span>{product.category}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="card-actions justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <span>Ratings:</span>
-                                        <span>{product.ratings} ⭐</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <span>Creation Date:</span>
-                                        <span>{new Date(product.productCreationDateTime).toLocaleDateString()}</span>
+                                    <div className="card-actions justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span>Ratings:</span>
+                                            <span>{product.ratings} ⭐</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span>Creation Date:</span>
+                                            <span>{new Date(product.productCreationDateTime).toLocaleDateString()}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
             <div className="text-center w-full mb-10 flex flex-col items-center">
                 <div className="flex items-center mb-4">
                     <button className="btn mr-2" onClick={handlePrev} disabled={currentPage === 0}>Previous</button>
@@ -98,8 +115,8 @@ const Home = () => {
                     ))}
                     <button className="btn" onClick={handleNext} disabled={currentPage === pages.length - 1}>Next</button>
                 </div>
-                <div>
-                    <select value={itemsPerPage} onChange={handleItemsPerPage} className="ml-4">
+                <div className="flex items-center mb-4">
+                    <select value={itemsPerPage} onChange={handleItemsPerPage} className="btn ml-4">
                         {[8, 12, 16, 20].map(value => (
                             <option key={value} value={value}>{value}</option>
                         ))}

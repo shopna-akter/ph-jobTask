@@ -9,12 +9,17 @@ import Root from './Root/Root.jsx';
 import AuthProvider from './Providers/AuthProvider.jsx';
 import Register from './Authentication/Register/Register.jsx';
 import Login from './Authentication/Login/Login.jsx';
+import Home from './Pages/Home.jsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root></Root>,
     children: [
+      {
+        path: '/',
+        element: <Home></Home>
+      },
       {
         path: '/Register',
         element: <Register></Register>

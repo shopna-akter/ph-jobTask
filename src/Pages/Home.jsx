@@ -4,7 +4,7 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [pages, setPages] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(8);
+    const [itemsPerPage, setItemsPerPage] = useState(9);
     const [count, setCount] = useState(0);
     const [sortOrder, setSortOrder] = useState('priceLowToHigh');
     const [searchValue, setSearchValue] = useState('');
@@ -110,7 +110,7 @@ const Home = () => {
                 ))}
                 <button onClick={handleNext} disabled={currentPage === pages.length - 1} className="btn btn-secondary ml-2">Next</button>
                 <select value={itemsPerPage} onChange={handleItemsPerPage} className="ml-4">
-                    {[8, 12, 16, 20].map(value => (
+                    {[9, 12, 16, 20].map(value => (
                         <option key={value} value={value}>{value} per page</option>
                     ))}
                 </select>

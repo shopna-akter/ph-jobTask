@@ -4,24 +4,24 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [pages, setPages] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(9);
+    const [itemsPerPage, setItemsPerPage] = useState(8);
     const [count, setCount] = useState(0);
-    const [selected, setSelected] = useState('bg-indigo-500 hover:bg-indigo-600 text-white');
+    const [selected, setSelected] = useState('bg-indigo-500 hover:bg-indigo-500');
 
     useEffect(() => {
-        fetch('http://localhost:5000/Products')
+        fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}`)
             .then(res => res.json())
-            .then(data => setProducts(data))
-            .catch(error => console.error('Error fetching products:', error));
-    }, []);
+            .then(data => {
+                setProducts(data);
+            });
+    }, [currentPage, itemsPerPage]);
 
     useEffect(() => {
         fetch('http://localhost:5000/productsCount')
             .then(res => res.json())
             .then(data => {
                 setCount(data.count);
-            })
-            .catch(error => console.error('Error fetching products count:', error));
+            });
     }, []);
 
     useEffect(() => {
@@ -49,7 +49,7 @@ const Home = () => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((product) => (
+            {products.map((product) => (
                 <div className="mx-4" key={product._id}>
                     <div className="mb-4">
                         <div className="card border bg-base-100 shadow-xl">
@@ -85,7 +85,7 @@ const Home = () => {
                 </div>
             ))}
             <div className="text-center w-full mb-10 flex flex-col items-center">
-                <div className=" items-center mb-4">
+                <div className="flex items-center mb-4">
                     <button className="btn mr-2" onClick={handlePrev} disabled={currentPage === 0}>Previous</button>
                     {pages.slice(Math.max(0, currentPage - 2), Math.min(pages.length, currentPage + 3)).map(page => (
                         <button

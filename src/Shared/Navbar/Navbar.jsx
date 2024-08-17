@@ -1,4 +1,41 @@
+import { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
+import Swal from "sweetalert2";
+import { AuthContext } from "../../Providers/AuthProvider";
+
 const Navbar = () => {
+    const { logOut, user } = useContext(AuthContext);
+
+    const handleSignOut = () => {
+        Swal.fire({
+            title: "Are you sure you want to log out?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, log out!'
+        })
+        .then(result => {
+            if (result.isConfirmed) {
+                logOut()
+                    .then(() => {
+                        Swal.fire({
+                            title: "Logged out!",
+                            text: "You have been successfully logged out.",
+                            icon: "success"
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Failed to log out: ${error.message}`,
+                            icon: "error"
+                        });
+                    });
+            }
+        });
+    };
+
     return (
         <div>
             <div className="navbar bg-base-100">
@@ -21,36 +58,35 @@ const Navbar = () => {
                         <ul
                             tabIndex={0}
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                            <li><a>Item 1</a></li>
-                            <li>
-                                <a>Parent</a>
-                                <ul className="p-2">
-                                    <li><a>Submenu 1</a></li>
-                                    <li><a>Submenu 2</a></li>
-                                </ul>
-                            </li>
-                            <li><a>Item 3</a></li>
+                            {user ? (
+                                <button onClick={handleSignOut} className="btn bg-orange-400 hover:bg-orange-600">Sign Out</button>
+                            ) : null}
                         </ul>
                     </div>
-                    <a className="btn btn-ghost text-xl">daisyUI</a>
+                    <Link to='/' className="btn btn-ghost text-xl">daisyUI</Link>
                 </div>
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
-                        <li><a>Item 1</a></li>
-                        <li>
-                            <details>
-                                <summary>Parent</summary>
-                                <ul className="p-2">
-                                    <li><a>Submenu 1</a></li>
-                                    <li><a>Submenu 2</a></li>
-                                </ul>
-                            </details>
-                        </li>
-                        <li><a>Item 3</a></li>
+                        {user ? (
+                            <button onClick={handleSignOut} className="btn bg-orange-400 hover:bg-orange-600">Sign Out</button>
+                        ) : null}
                     </ul>
                 </div>
                 <div className="navbar-end">
-                    <a className="btn">Button</a>
+                    {!user && (
+                        <>
+                            <NavLink to='/Register' className="btn mr-2 btn-ghost">Register</NavLink>
+                            <NavLink to='/Login' className="btn mr-2 btn-ghost">Login</NavLink>
+                        </>
+                    )}
+                    {
+                        user && (
+                            <>
+                                <img
+                                    className='h-9 w-9 rounded-full mt-2 mr-2' src='https://i.ibb.co/yWR8BCV/user.png' alt="" />
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>

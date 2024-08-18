@@ -1,38 +1,40 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from "react";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [pages, setPages] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(9);
+    // eslint-disable-next-line no-unused-vars
     const [count, setCount] = useState(0);
     const [sortOrder, setSortOrder] = useState('priceLowToHigh');
     const [searchValue, setSearchValue] = useState('');
-    const [brandFilter, setBrandFilter] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
-    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [brand, setBrand] = useState('');
+    const [category, setCategory] = useState('');
+    const [priceRange, setPriceRange] = useState([50, 300]);
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch(
-                `http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}&brand=${brandFilter}&category=${categoryFilter}&minPrice=${priceRange.min}&maxPrice=${priceRange.max}`
-            );
+            const response = await fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
             const data = await response.json();
             setProducts(data);
         };
         fetchProducts();
-    }, [currentPage, itemsPerPage, sortOrder, searchValue, brandFilter, categoryFilter, priceRange]);
+    }, [currentPage, itemsPerPage, sortOrder, searchValue, brand, category, priceRange]);
 
     useEffect(() => {
         const fetchCount = async () => {
-            const response = await fetch('http://localhost:5000/productsCount');
+            const response = await fetch(`http://localhost:5000/productsCount?search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
             const data = await response.json();
             setCount(data.count);
             const numberOfPages = Math.ceil(data.count / itemsPerPage);
             setPages([...Array(numberOfPages).keys()]);
         };
         fetchCount();
-    }, [itemsPerPage]);
+    }, [itemsPerPage, priceRange, brand, category]);
 
     const handleItemsPerPage = (e) => {
         setItemsPerPage(parseInt(e.target.value));
@@ -60,19 +62,8 @@ const Home = () => {
         setSearchValue(e.target.searchField.value);
     };
 
-    const handleBrandFilter = (e) => {
-        setBrandFilter(e.target.value);
-        setCurrentPage(0);
-    };
-
-    const handleCategoryFilter = (e) => {
-        setCategoryFilter(e.target.value);
-        setCurrentPage(0);
-    };
-
-    const handlePriceRange = (e) => {
-        setPriceRange({ ...priceRange, [e.target.name]: e.target.value });
-        setCurrentPage(0);
+    const handlePriceRangeChange = (range) => {
+        setPriceRange(range);
     };
 
     return (
@@ -87,7 +78,26 @@ const Home = () => {
                     />
                     <button type="submit" className="btn btn-primary ml-2">Search</button>
                 </form>
-                <div className="flex">
+                <div>
+                    <label className="block text-sm font-medium w-96 text-gray-700">Price Range:</label>
+                    <Slider
+                        range
+                        min={50}
+                        max={300}
+                        defaultValue={priceRange}
+                        value={priceRange}
+                        onChange={handlePriceRangeChange}
+                        trackStyle={[{ backgroundColor: '#007bff', height: 6 }]}
+                        handleStyle={[{ borderColor: '#007bff', height: 20, width: 20 }]}
+                        railStyle={{ backgroundColor: '#ddd', height: 6 }}
+                        style={{ marginBottom: '10px', width: '100%', maxWidth: '500px' }}
+                    />
+                    <div className="flex justify-between mt-2 text-sm text-gray-600">
+                        <span>{priceRange[0]}</span>
+                        <span>{priceRange[1]}</span>
+                    </div>
+                </div>
+                <div>
                     <label htmlFor="sort" className="mr-2">Sort by:</label>
                     <select id="sort" onChange={handleSort} className="select select-bordered">
                         <option value="priceLowToHigh">Price: Low to High</option>
@@ -97,46 +107,31 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="flex justify-between items-center mb-4">
-                <div>
-                    <label htmlFor="brandFilter" className="mr-2">Brand:</label>
-                    <input
-                        id="brandFilter"
-                        type="text"
-                        placeholder="Brand Name"
-                        className="input input-bordered"
-                        onChange={handleBrandFilter}
-                    />
+
+
+            <div className="mb-4 flex space-x-4">
+                <div className="w-1/2">
+                    <label htmlFor="brand" className="block text-sm font-medium text-gray-700">Brand:</label>
+                    <select id="brand" onChange={(e) => setBrand(e.target.value)} className="select select-bordered">
+                        <option value="">All Brands</option>
+                        <option value="Vans">Vans</option>
+                        <option value="Converse">Converse</option>
+                        <option value="Nike">Nike</option>
+                        <option value="Adidas">Adidas</option>
+                        <option value="puma">Puma</option>
+                    </select>
                 </div>
-                <div>
-                    <label htmlFor="categoryFilter" className="mr-2">Category:</label>
-                    <input
-                        id="categoryFilter"
-                        type="text"
-                        placeholder="Category Name"
-                        className="input input-bordered"
-                        onChange={handleCategoryFilter}
-                    />
-                </div>
-                <div className="flex">
-                    <label htmlFor="minPrice" className="mr-2">Min Price:</label>
-                    <input
-                        id="minPrice"
-                        name="min"
-                        type="number"
-                        placeholder="Min"
-                        className="input input-bordered"
-                        onChange={handlePriceRange}
-                    />
-                    <label htmlFor="maxPrice" className="mr-2 ml-4">Max Price:</label>
-                    <input
-                        id="maxPrice"
-                        name="max"
-                        type="number"
-                        placeholder="Max"
-                        className="input input-bordered"
-                        onChange={handlePriceRange}
-                    />
+                <div className="w-1/2">
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category:</label>
+                    <select id="category" onChange={(e) => setCategory(e.target.value)} className="select select-bordered">
+                        <option value="">All Categories</option>
+                        <option value="Unisex Sneaker">Unisex Sneaker</option>
+                        <option value="Men's Running Shoe">Men's Running Shoe</option>
+                        <option value="Men's Sneaker">Men's Sneaker</option>
+                        <option value="Women's Sneaker">Women's Sneaker</option>
+                        <option value="Men's Training Shoe">Men's Training Shoe</option>
+                        <option value="Unisex Slide">Unisex Slide</option>
+                    </select>
                 </div>
             </div>
 
@@ -150,6 +145,7 @@ const Home = () => {
                             <div className="flex justify-between">
                                 <span>Price: ${product.price}</span>
                                 <span>Category: {product.category}</span>
+                                <span>Brand: {product.Brand}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Ratings: {product.ratings} ⭐</span>

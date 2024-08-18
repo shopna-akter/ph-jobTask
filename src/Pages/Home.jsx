@@ -18,7 +18,7 @@ const Home = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const response = await fetch(`http://localhost:5000/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
+            const response = await fetch(`https://ph-server-nu.vercel.app/products?size=${itemsPerPage}&page=${currentPage}&sort=${sortOrder}&search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
             const data = await response.json();
             setProducts(data);
         };
@@ -27,7 +27,7 @@ const Home = () => {
 
     useEffect(() => {
         const fetchCount = async () => {
-            const response = await fetch(`http://localhost:5000/productsCount?search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
+            const response = await fetch(`https://ph-server-nu.vercel.app/productsCount?search=${searchValue}&brand=${brand}&category=${category}&minPrice=${priceRange[0]}&maxPrice=${priceRange[1]}`);
             const data = await response.json();
             setCount(data.count);
             const numberOfPages = Math.ceil(data.count / itemsPerPage);
@@ -68,7 +68,7 @@ const Home = () => {
 
     return (
         <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-4">
+            <div className="lg:flex justify-between items-center mb-4">
                 <form onSubmit={handleSearch} className="flex items-center">
                     <input
                         name="searchField"

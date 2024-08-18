@@ -63,7 +63,7 @@ const Navbar = () => {
                             ) : null}
                         </ul>
                     </div>
-                    <Link to='/' className="btn btn-ghost text-xl">daisyUI</Link>
+                    <Link to='/' className=""><img className="h-20 w-50 lg:ml-10" src="https://i.ibb.co/C1YBZWv/e-mart.png" alt="" /></Link>
                 </div>
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
